@@ -1,0 +1,53 @@
+# require:
+#   - rubocop-minitest
+#   - rubocop-rake
+
+AllCops:
+  NewCops: enable
+  TargetRubyVersion: 4.0
+  UseCache: false
+  SuggestExtensions: false
+  Exclude:
+    - 'bin/**/*'
+    - 'db/**/*'
+    - 'config/**/*'
+    - 'vendor/**/*'
+    - 'node_modules/**/*'
+    - 'Gemfile.lock'
+    - 'sig/**/*'
+    - 'lib/generators/**/templates/**/*'
+
+Style/Documentation:
+  Enabled: false
+
+Metrics/BlockLength:
+  Max: 50
+  Exclude:
+    - 'test/**/*'
+    - 'lib/generators/**/*'
+    - 'plan_pay.gemspec'
+
+Metrics/MethodLength:
+  Max: 40
+
+Metrics/ClassLength:
+  Max: 200
+
+Metrics/ModuleLength:
+  Max: 200
+
+Metrics/AbcSize:
+  Max: 30
+
+Metrics/CyclomaticComplexity:
+  Max: 15
+
+Metrics/PerceivedComplexity:
+  Max: 15
+
+Metrics/ParameterLists:
+  Max: 6
+
+Gemspec/DevelopmentDependencies:
+  Enabled: false
+

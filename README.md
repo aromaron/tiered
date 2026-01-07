@@ -6,9 +6,9 @@ A comprehensive Rails gem for billing integration, subscription management, and 
 
 ## Status
 
-🚧 **Planning Phase** → Moving to Implementation (v1.0)
+✅ **v0.1.0 - Ready for Release**
 
-This gem is currently in active development. The core architecture and data model have been designed. See the [documentation](./docs/) for detailed proposals and implementation plans.
+Core v1.0 MVP features are complete and tested. The gem is ready for use in Rails 8.0+ applications.
 
 ## Features
 
@@ -82,16 +82,18 @@ PlanPay.configure do |config|
   
   config.plan :free do |free|
     free.name "Free"
-    free.quota :households, to: 1, per: nil, type: :persistent
-    free.quota :members, to: 4, per: nil, type: :persistent
+    free.quota :households, to: 1, per: nil, type: :persistent, scope: ->(user) { user.households }
+    free.quota :api_calls, to: 100, per: :month, type: :per_period
+    free.restrict :split_type, values: [:equal_parts]
     free.after_quota_policy :block_usage
   end
   
   config.plan :plus do |plus|
     plus.name "Plus"
     plus.price 99
-    plus.quota :households, to: 3, per: nil, type: :persistent
-    plus.quota :members, to: 8, per: nil, type: :persistent
+    plus.price_string "$99/mo"
+    plus.quota :households, to: 3, per: nil, type: :persistent, scope: ->(user) { user.households }
+    plus.quota :api_calls, to: 1000, per: :month, type: :per_period
     plus.after_quota_policy :grace_then_block
     plus.grace_period_days 7
   end
@@ -103,14 +105,18 @@ end
 ```ruby
 # app/models/user.rb
 class User < ApplicationRecord
-  include PlanPay::HasPlan
+  include PlanPay::Concerns::HasPlan
 end
 
 # app/models/household.rb
 class Household < ApplicationRecord
-  include PlanPay::QuotaLimited
+  belongs_to :user
   
-  quota_key :households
+  include PlanPay::Concerns::QuotaLimited
+  
+  quota_limited_by :households,
+                   plan_owner: :user,
+                   error_after_quota: ->(_household) { 'Household limit exceeded' }
 end
 ```
 
@@ -119,7 +125,7 @@ end
 ```ruby
 # app/controllers/households_controller.rb
 class HouseholdsController < ApplicationController
-  include PlanPay::ActionGuards
+  include PlanPay::Rails::ActionGuards
   
   guard_action :create, quota: :households
   
@@ -148,18 +154,18 @@ PlanPay provides:
 
 ### Core Components
 
-- `PlanRegistry` - Plan definitions and lookup
-- `PlanResolver` - Resolve user's active plan (subscription → manual → default)
-- `QuotaChecker` - Check if quotas are within limits
-- `QuotaEnforcer` - Enforce quota policies (block, grace, warn)
-- `HasPlan` - Mixin for User/Organization models
-- `QuotaLimited` - Mixin for resource models
-- `ActionGuards` - Controller guards for quota enforcement
+- `PlanPay::PlanRegistry` - Plan definitions and lookup
+- `PlanPay::Services::PlanResolver` - Resolve user's active plan (manual → default)
+- `PlanPay::Services::QuotaChecker` - Check if quotas are within limits
+- `PlanPay::Services::QuotaEnforcer` - Enforce quota policies (block, grace, warn)
+- `PlanPay::Concerns::HasPlan` - Mixin for User/Organization models
+- `PlanPay::Concerns::QuotaLimited` - Mixin for resource models
+- `PlanPay::Rails::ActionGuards` - Controller guards for quota enforcement
 
 ## Requirements
 
 - Ruby >= 4.0.0
-- Rails >= 7.1
+- Rails >= 8.0
 - ActiveRecord
 - ActiveSupport
 
@@ -171,7 +177,7 @@ To install this gem onto your local machine, run `bundle exec rake install`. To 
 
 ## Contributing
 
-Bug reports and pull requests are welcome on GitHub. This project is intended to be a safe, welcoming space for collaboration, and contributors are expected to adhere to the [code of conduct](https://github.com/yourusername/plan_pay/blob/main/CODE_OF_CONDUCT.md).
+Bug reports and pull requests are welcome on GitHub. This project is intended to be a safe, welcoming space for collaboration, and contributors are expected to adhere to the [code of conduct](https://github.com/aromaron/plan_pay/blob/main/CODE_OF_CONDUCT.md).
 
 ## License
 
@@ -179,4 +185,4 @@ The gem is available as open source under the terms of the [MIT License](https:/
 
 ## Origin
 
-PlanPay was born from [RumiPay](https://github.com/yourusername/rumipay), extracted to provide a reusable solution for plan management, subscriptions, and feature gating in Rails applications.
+PlanPay was born from [RumiPay](#), extracted to provide a reusable solution for plan management, subscriptions, and feature gating in Rails applications.
