@@ -5,8 +5,8 @@ require 'rails/generators/active_record'
 
 module PlanPay
   module Generators
-    class InstallGenerator < Rails::Generators::Base
-      include ActiveRecord::Generators::Migration
+    class InstallGenerator < ::Rails::Generators::Base
+      include ::ActiveRecord::Generators::Migration
 
       source_root File.expand_path('templates', __dir__)
 
