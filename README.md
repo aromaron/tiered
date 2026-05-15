@@ -2,7 +2,7 @@
 
 Define and enforce pricing plan limits in your Rails application. PlanPay helps you implement tiered pricing with usage quotas, feature restrictions, and period-based limits.
 
-Extracted from a Personal Project. Use this gem at your discretion since is not fully under maintenance at the moment and serves more as a POC for my side projects.
+Extracted from a Personal Project. **Use this gem at your discretion since is not fully under maintenance** at the moment and serves more as a POC for my side projects.
 
 ## Installation
 
