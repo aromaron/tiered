@@ -13,11 +13,11 @@ module TestConfigurationHelper
   end
 
   def reset_configuration!
-    PlanPay.configuration = PlanPay::Configuration.new
+    Tiered.configuration = Tiered::Configuration.new
   end
 
   def setup_test_plans
-    PlanPay.configure do |config|
+    Tiered.configure do |config|
       config.default_plan = :free
 
       config.plan :free do |free|
@@ -64,9 +64,9 @@ module TestConfigurationHelper
   end
 
   def cleanup_test_data
-    PlanPay::Models::Assignment.delete_all
-    PlanPay::Models::QuotaState.delete_all
-    PlanPay::Models::Usage.delete_all
+    Tiered::Models::Assignment.delete_all
+    Tiered::Models::QuotaState.delete_all
+    Tiered::Models::Usage.delete_all
     User.delete_all
     Household.delete_all
   end

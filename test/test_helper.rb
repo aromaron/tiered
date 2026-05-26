@@ -7,7 +7,7 @@ require 'minitest/autorun'
 require 'rails'
 require 'active_record'
 require 'active_support'
-require 'plan_pay'
+require 'tiered'
 
 # Load test support
 require_relative 'support/test_configuration_helper'
@@ -20,17 +20,17 @@ ActiveRecord::Base.establish_connection(
 
 # Load migrations
 ActiveRecord::Schema.define do
-  create_table :plan_pay_assignments, force: true do |t|
+  create_table :tiered_assignments, force: true do |t|
     t.references :plan_owner, polymorphic: true, null: false
     t.string :plan_key, null: false
     t.string :source, null: false
     t.timestamps
   end
 
-  add_index :plan_pay_assignments, %i[plan_owner_type plan_owner_id], unique: true
-  add_index :plan_pay_assignments, :plan_key
+  add_index :tiered_assignments, %i[plan_owner_type plan_owner_id], unique: true
+  add_index :tiered_assignments, :plan_key
 
-  create_table :plan_pay_quota_states, force: true do |t|
+  create_table :tiered_quota_states, force: true do |t|
     t.references :plan_owner, polymorphic: true, null: false
     t.string :quota_key, null: false
     t.datetime :exceeded_at
@@ -41,13 +41,13 @@ ActiveRecord::Schema.define do
     t.timestamps
   end
 
-  add_index :plan_pay_quota_states,
+  add_index :tiered_quota_states,
             %i[plan_owner_type plan_owner_id quota_key],
             unique: true,
-            name: 'index_plan_pay_quota_states_unique'
-  add_index :plan_pay_quota_states, %i[plan_owner_type plan_owner_id]
+            name: 'index_tiered_quota_states_unique'
+  add_index :tiered_quota_states, %i[plan_owner_type plan_owner_id]
 
-  create_table :plan_pay_usages, force: true do |t|
+  create_table :tiered_usages, force: true do |t|
     t.references :plan_owner, polymorphic: true, null: false
     t.string :quota_key, null: false
     t.datetime :period_start, null: false
@@ -57,12 +57,12 @@ ActiveRecord::Schema.define do
     t.timestamps
   end
 
-  add_index :plan_pay_usages,
+  add_index :tiered_usages,
             %i[plan_owner_type plan_owner_id quota_key period_start],
             unique: true,
-            name: 'index_plan_pay_usages_unique'
-  add_index :plan_pay_usages, %i[plan_owner_type plan_owner_id]
-  add_index :plan_pay_usages, %i[period_start period_end]
+            name: 'index_tiered_usages_unique'
+  add_index :tiered_usages, %i[plan_owner_type plan_owner_id]
+  add_index :tiered_usages, %i[period_start period_end]
 
   # Test model for plan owners
   create_table :users, force: true do |t|
@@ -80,7 +80,7 @@ end
 
 # Test models
 class User < ActiveRecord::Base
-  include PlanPay::Concerns::HasPlan
+  include Tiered::Concerns::HasPlan
 
   has_many :households, dependent: :destroy
 end
@@ -88,7 +88,7 @@ end
 class Household < ActiveRecord::Base
   belongs_to :user
 
-  include PlanPay::Concerns::QuotaLimited
+  include Tiered::Concerns::QuotaLimited
 
   quota_limited_by :households,
                    plan_owner: :user,

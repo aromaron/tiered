@@ -1,23 +1,23 @@
-# PlanPay
+# Tiered
 
-Define and enforce pricing plan limits in your Rails application. PlanPay helps you implement tiered pricing with usage quotas, feature restrictions, and period-based limits.
+Define and enforce pricing plan limits in your Rails application. Tiered helps you implement tiered pricing with usage quotas, feature restrictions, and period-based limits.
 
 Extracted from a Personal Project and still under development. **Use this gem at your discretion since is not fully under maintenance** at the moment and serves more as a POC for my side projects.
 
 ## Installation
 
-This is a private gem. Install it from GitHub:
+Install from GitHub:
 
 ```ruby
-gem 'plan_pay', git: 'https://github.com/aromaron/plan_pay.git'
+gem 'tiered', git: 'https://github.com/aromaron/tiered.git'
 ```
 
 Or using a specific branch or tag:
 
 ```ruby
-gem 'plan_pay', git: 'https://github.com/aromaron/plan_pay.git', branch: 'main'
+gem 'tiered', git: 'https://github.com/aromaron/tiered.git', branch: 'main'
 # or
-gem 'plan_pay', git: 'https://github.com/aromaron/plan_pay.git', tag: 'v0.1.0'
+gem 'tiered', git: 'https://github.com/aromaron/tiered.git', tag: 'v0.1.0'
 ```
 
 Then execute:
@@ -29,16 +29,16 @@ bundle install
 Run the install generator to create the initializer and migrations:
 
 ```bash
-rails generate plan_pay:install
+rails generate tiered:install
 rails db:migrate
 ```
 
 ## Configuration
 
-Create an initializer at `config/initializers/plan_pay.rb`:
+Create an initializer at `config/initializers/tiered.rb`:
 
 ```ruby
-PlanPay.configure do |config|
+Tiered.configure do |config|
   # Default plan for new users
   config.default_plan = :free
   
@@ -55,7 +55,7 @@ end
 Define your pricing tiers in the configuration:
 
 ```ruby
-PlanPay.configure do |config|
+Tiered.configure do |config|
   config.plan :free do |plan|
     plan.name "Free"
     plan.description "Perfect for getting started"
@@ -109,7 +109,7 @@ Include the `HasPlan` concern in your user model:
 
 ```ruby
 class User < ApplicationRecord
-  include PlanPay::Concerns::HasPlan
+  include Tiered::Concerns::HasPlan
 end
 ```
 
@@ -119,7 +119,7 @@ Now your users have plan-related methods:
 user = User.first
 
 # Get current plan
-user.current_plan        # => PlanPay::PlanDefinition
+user.current_plan        # => Tiered::PlanDefinition
 user.plan_key            # => :free
 
 # Check quotas
@@ -146,13 +146,12 @@ Use the `QuotaLimited` concern to enforce limits when creating records:
 
 ```ruby
 class Project < ApplicationRecord
-  include PlanPay::Concerns::QuotaLimited
-  
+  include Tiered::Concerns::QuotaLimited
+
   belongs_to :user
-  
+
   quota_limited_by :projects,
     plan_owner: :user,
-    scope: ->(user) { user.projects },
     error_after_quota: "You've reached your project limit. Upgrade to create more."
 end
 ```
@@ -163,17 +162,17 @@ Use action guards to protect controller actions:
 
 ```ruby
 class ApiController < ApplicationController
-  include PlanPay::Rails::ActionGuards
+  include Tiered::Rails::ActionGuards
   
   # Set the plan owner method (defaults to current_user)
-  plan_pay_plan_owner_method :current_user
+  tiered_plan_owner_method :current_user
   
   # Guard specific actions
   guard_action :create, quota: :projects
-  guard_action :upload, quota: :storage_gb, by: 10
+  guard_action :upload, quota: :storage_gb
   
   # Custom redirect on blocked
-  plan_pay_redirect_on_blocked_limit ->(result) {
+  tiered_redirect_on_blocked_limit ->(result) {
     redirect_to pricing_path, alert: result.message
   }
 end
@@ -190,7 +189,7 @@ before_action :track_api_usage
 private
 
 def track_api_usage
-  PlanPay::Services::ConsumptionTracker.track(
+  Tiered::Services::ConsumptionTracker.track(
     current_user,
     :api_calls,
     by: 1
@@ -245,12 +244,11 @@ Control behavior when quotas are exceeded:
 
 - `:block_usage` - Prevent further usage (default)
 - `:grace_then_block` - Allow grace period, then block
-- `:notify_only` - Allow usage but notify admin
+- `:just_warn` - Allow usage but return a warning message
 
 ```ruby
 plan.after_quota_policy :grace_then_block
 plan.grace_period_days 7
-plan.warning_thresholds [50, 80, 90]  # Percentages
 ```
 
 ## Advanced Usage
@@ -272,7 +270,7 @@ result.percent_used   # => 76.6
 user.assign_plan!(:pro, source: 'stripe_subscription_123')
 
 # Check assignment history
-user.plan_pay_assignments.order(created_at: :desc)
+user.tiered_assignments.order(created_at: :desc)
 
 # Remove plan (falls back to default)
 user.remove_plan!
@@ -287,7 +285,7 @@ user.remove_plan!
   <p>Upgrade to create more projects</p>
 <% end %>
 
-<%= quota_progress_bar(current_user, :storage_gb) %>
+<%= tiered_quota_meter(quota: :storage_gb, plan_owner: current_user) %>
 ```
 
 ## Testing
@@ -296,7 +294,7 @@ Configure test-specific plans in your test helper:
 
 ```ruby
 # test/test_helper.rb
-PlanPay.configure do |config|
+Tiered.configure do |config|
   config.plan :test do |plan|
     plan.name "Test"
     plan.quota :projects, to: 100, type: :persistent,
@@ -364,7 +362,7 @@ To create a new release (tag and build), update the version number in `version.r
 
 ## Contributing
 
-Bug reports and pull requests are welcome on GitHub at https://github.com/aromaron/plan_pay.
+Bug reports and pull requests are welcome on GitHub at https://github.com/aromaron/tiered.
 
 ## License
 
