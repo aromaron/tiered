@@ -29,8 +29,8 @@ elsif defined?(ActiveRecord)
   require_relative 'tiered/models/usage'
 end
 
-# Load Railtie for Rails integration
-require_relative 'tiered/railtie' if defined?(Rails)
+# Load Engine for Rails integration
+require_relative 'tiered/engine' if defined?(Rails)
 
 module Tiered
   class << self

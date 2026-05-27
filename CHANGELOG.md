@@ -7,6 +7,26 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.3.0] - 2026-05-27
+
+### Breaking Changes
+- `quota_limited_by` kwarg renamed: `count_scope:` → `scope:` (consistent with the plan DSL's `scope:` kwarg).
+- `:billing_cycle` removed from `PeriodCalculator` — it was identical to `:calendar_month`. Use `:calendar_month` instead.
+- `Tiered::Railtie` replaced by `Tiered::Engine`. Direct references to `Tiered::Railtie` must be updated.
+- `guard_action` dropped the undocumented `plan_owner:` keyword argument (it was accepted but never used).
+
+### Added
+- `app/views/tiered/_quota_alert.html.erb` and `_quota_meter.html.erb` — host apps can override by placing replacement files under their own `app/views/tiered/`.
+- RuboCop (`rubocop`, `rubocop-minitest`, `rubocop-rails`) with `.rubocop.yml`; lint CI job added.
+- SimpleCov coverage reporting (90% line coverage baseline).
+
+### Changed
+- `Float::INFINITY` replaces the `:unlimited` symbol sentinel throughout. `quota[:to]` is now always numeric; `Result#unlimited?` checks `limit == Float::INFINITY`. The DSL still accepts `to: :unlimited` and normalizes it at definition time.
+- `Railtie` promoted to `Engine` — `app/views` is automatically added to the host app's view path, enabling partial overrides.
+- `tiered_quota_alert` and `tiered_quota_meter` now render ERB partials instead of building HTML inline in Ruby.
+- CSS class names corrected from `plan-pay-quota-alert` / `plan-pay-quota-meter` to `tiered-quota-alert` / `tiered-quota-meter`.
+- `guard_action` installs a direct `before_action` block; the `method_missing` dispatch is removed.
+
 ## [0.2.0] - 2026-05-26
 
 ### Fixed

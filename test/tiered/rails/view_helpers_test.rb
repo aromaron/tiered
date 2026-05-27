@@ -6,23 +6,14 @@ require 'action_view'
 module Tiered
   module Rails
     class ViewHelpersTest < Minitest::Test
-      # Minimal view context that supports content_tag and the helpers under test.
-      class TestViewContext
-        include ActionView::Helpers::TagHelper
-        include ActionView::Helpers::OutputSafetyHelper
-        include Tiered::Rails::ViewHelpers
-
-        def output_buffer
-          @output_buffer ||= ActionView::OutputBuffer.new
-        end
-
-        attr_writer :output_buffer
-      end
-
       def setup
         super
         @user = create_user
-        @view = TestViewContext.new
+        views_dir = File.expand_path('../../../app/views', __dir__)
+        lookup_context = ActionView::LookupContext.new([views_dir])
+        klass = ActionView::Base.with_empty_template_cache
+        klass.include(Tiered::Rails::ViewHelpers)
+        @view = klass.new(lookup_context, {}, nil)
       end
 
       def test_quota_severity_ok_within_limit
@@ -31,18 +22,21 @@ module Tiered
 
       def test_quota_severity_blocked_when_exceeded_with_block_usage_policy
         create_household(user: @user)
+
         assert_equal :blocked, @view.quota_severity(:households, plan_owner: @user)
       end
 
       def test_tiered_quota_alert_empty_when_within_limit
         result = @view.tiered_quota_alert(quota: :households, plan_owner: @user)
+
         assert_equal '', result
       end
 
       def test_tiered_quota_alert_renders_html_when_exceeded
         create_household(user: @user)
         html = @view.tiered_quota_alert(quota: :households, plan_owner: @user)
-        assert_includes html, 'plan-pay-quota-alert'
+
+        assert_includes html, 'tiered-quota-alert'
         assert_includes html, 'blocked'
       end
 
@@ -56,12 +50,14 @@ module Tiered
         end
         @user.assign_plan!(:unlimited_plan)
         result = @view.tiered_quota_meter(quota: :households, plan_owner: @user)
+
         assert_equal '', result
       end
 
       def test_quota_remaining_returns_count
         assert_equal 1, @view.quota_remaining(:households, plan_owner: @user)
         create_household(user: @user)
+
         assert_equal 0, @view.quota_remaining(:households, plan_owner: @user)
       end
 

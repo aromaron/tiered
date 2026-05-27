@@ -1,0 +1,75 @@
+plugins:
+  - rubocop-minitest
+  - rubocop-rails
+
+AllCops:
+  TargetRubyVersion: 3.3
+  NewCops: enable
+  Exclude:
+    - "vendor/**/*"
+    - "tmp/**/*"
+    - "coverage/**/*"
+    - "lib/generators/tiered/install/templates/migrations/*.rb"
+
+Style/Documentation:
+  Enabled: false
+
+Style/StringLiterals:
+  EnforcedStyle: single_quotes
+
+# Gems declare dev deps in gemspec by convention; this cop targets Rails apps
+Gemspec/DevelopmentDependencies:
+  Enabled: false
+
+# TargetRubyVersion (lint target) and required_ruby_version (runtime floor) serve different purposes
+Gemspec/RequiredRubyVersion:
+  Enabled: false
+
+# quota_limited_by builds method closures; structural complexity is unavoidable
+Metrics/MethodLength:
+  Max: 20
+  Exclude:
+    - "lib/tiered/concerns/quota_limited.rb"
+    - "lib/tiered/services/quota_enforcer.rb"
+    - "test/support/**/*"
+
+Metrics/BlockLength:
+  Max: 60
+  Exclude:
+    - "test/**/*"
+    - "**/*.gemspec"
+    - "lib/tiered/concerns/quota_limited.rb"
+
+Metrics/AbcSize:
+  Max: 50
+
+Metrics/CyclomaticComplexity:
+  Max: 25
+
+Metrics/PerceivedComplexity:
+  Max: 30
+
+# Result value object uses 6 named keyword params; fine for a struct-like class
+Metrics/ParameterLists:
+  Max: 7
+
+# Integration-style tests naturally have more than 3 assertions per case
+Minitest/MultipleAssertions:
+  Max: 10
+
+# update_all is intentional for atomic increments — avoids read-modify-write race
+Rails/SkipsModelValidations:
+  Exclude:
+    - "lib/tiered/models/usage.rb"
+
+# Duplicate :warning branch in quota_severity is intentional explicit fallthrough
+Lint/DuplicateBranch:
+  Enabled: false
+
+# Gem models inherit from ActiveRecord::Base directly — no ApplicationRecord in scope
+Rails/ApplicationRecord:
+  Enabled: false
+
+# assert_not/assert_not_predicate are ActiveSupport extensions; we use plain Minitest
+Rails/RefuteMethods:
+  Enabled: false

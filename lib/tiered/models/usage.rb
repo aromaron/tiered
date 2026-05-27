@@ -10,7 +10,6 @@ module Tiered
       validates :quota_key, presence: true
       validates :period_start, presence: true
       validates :plan_owner_type, presence: true
-      validates :plan_owner_id, presence: true
       validates :quota_key, uniqueness: { scope: %i[plan_owner_type plan_owner_id period_start] }
 
       scope :for_quota, ->(quota_key) { where(quota_key: quota_key) }

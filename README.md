@@ -44,7 +44,7 @@ Tiered.configure do |config|
   # Default plan for new users
   config.default_plan = :free
   
-  # Period cycle for per-period quotas (:calendar_month, :billing_cycle)
+  # Period cycle for per-period quotas (:calendar_month, :calendar_week, :calendar_day)
   config.period_cycle = :calendar_month
   
   # How to resolve plan owner from controllers

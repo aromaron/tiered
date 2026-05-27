@@ -12,14 +12,16 @@ module Tiered
 
       def test_enforce_allows_when_within_quota
         result = QuotaEnforcer.enforce(@user, :households)
-        assert result.allowed?
+
+        assert_predicate result, :allowed?
         assert_nil result.message
       end
 
       def test_enforce_blocks_with_block_usage_policy
         create_household(user: @user)
         result = QuotaEnforcer.enforce(@user, :households)
-        refute result.allowed?
+
+        refute_predicate result, :allowed?
         assert_equal :block_usage, result.policy
         assert_match(/exceeded/, result.message)
       end
@@ -36,7 +38,8 @@ module Tiered
         @user.assign_plan!(:warn_plan)
         create_household(user: @user)
         result = QuotaEnforcer.enforce(@user, :households)
-        assert result.allowed?
+
+        assert_predicate result, :allowed?
         assert_equal :just_warn, result.policy
         assert_match(/exceeded|Warning/i, result.message)
       end
@@ -51,7 +54,8 @@ module Tiered
         household.save(validate: false) # Exceeds limit of 3
 
         result = QuotaEnforcer.enforce(@user, :households)
-        assert result.allowed?
+
+        assert_predicate result, :allowed?
         assert_equal :grace_then_block, result.policy
         assert_match(/grace period/i, result.message)
 
@@ -61,6 +65,7 @@ module Tiered
           plan_owner_id: @user.id,
           quota_key: :households
         )
+
         refute_nil state
         refute_nil state.exceeded_at
       end

@@ -7,13 +7,11 @@ module Tiered
         result = Services::QuotaChecker.check(plan_owner, quota)
         return '' if result.within_quota? || result.unlimited?
 
-        css_class = options[:class] || 'plan-pay-quota-alert'
+        css_class = options[:class] || 'tiered-quota-alert'
         severity = quota_severity(quota, plan_owner: plan_owner)
         message = quota_message(quota, plan_owner: plan_owner)
 
-        content_tag(:div, class: "#{css_class} #{css_class}--#{severity}") do
-          content_tag(:p, message, class: "#{css_class}__message")
-        end
+        render partial: 'tiered/quota_alert', locals: { css_class: css_class, severity: severity, message: message }
       end
 
       def tiered_quota_meter(quota:, plan_owner:, current: nil, max: nil, **options)
@@ -26,25 +24,18 @@ module Tiered
         percent = max.zero? ? 0 : (current.to_f / max * 100.0).round(2)
         percent = [percent, 100.0].min
 
-        css_class = options[:class] || 'plan-pay-quota-meter'
+        css_class = options[:class] || 'tiered-quota-meter'
         severity = quota_severity(quota, plan_owner: plan_owner)
 
-        content_tag(:div, class: "#{css_class} #{css_class}--#{severity}") do
-          content_tag(:div, class: "#{css_class}__bar") do
-            content_tag(:div, '',
-                        class: "#{css_class}__fill",
-                        style: "width: #{percent}%")
-          end +
-            content_tag(:div, class: "#{css_class}__label") do
-              "#{current} / #{max == :unlimited ? '∞' : max}"
-            end
-        end
+        render partial: 'tiered/quota_meter',
+               locals: { css_class: css_class, severity: severity, current: current, max: max,
+                         percent: percent }
       end
 
       def quota_remaining(quota, plan_owner:)
         result = Services::QuotaChecker.check(plan_owner, quota)
         remaining = result.remaining
-        remaining == :unlimited ? '∞' : remaining
+        remaining == Float::INFINITY ? '∞' : remaining
       end
 
       def quota_percent_used(quota, plan_owner:)

@@ -20,8 +20,8 @@ module Tiered
         time = Time.utc(2026, 1, 15, 12, 0, 0) # Wednesday
         period = PeriodCalculator.calculate(:calendar_week, time)
 
-        assert period[:start].monday?
-        assert period[:end].sunday?
+        assert_predicate period[:start], :monday?
+        assert_predicate period[:end], :sunday?
       end
 
       def test_calculate_calendar_day
@@ -34,6 +34,7 @@ module Tiered
 
       def test_current_period
         period = PeriodCalculator.current_period
+
         refute_nil period[:start]
         refute_nil period[:end]
       end
