@@ -2,7 +2,9 @@
 
 Define and enforce pricing plan limits in your Rails application. Tiered helps you implement tiered pricing with usage quotas, feature restrictions, and period-based limits.
 
-Extracted from a Personal Project and still under development. **Use this gem at your discretion since is not fully under maintenance** at the moment and serves more as a POC for my side projects.
+Early-stage gem extracted from a personal project. API may change before 1.0 — pin to a commit or tag if you need stability.
+
+Inspired by [pricing_plans](https://github.com/rameerez/pricing_plans) by @rameerez.
 
 ## Installation
 

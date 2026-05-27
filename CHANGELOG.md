@@ -7,6 +7,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.2.0] - 2026-05-26
+
 ### Fixed
 - `quota_severity` returned `:warning` for `:block_usage` policy due to a dead expression discarding the policy value. Now correctly returns `:blocked`.
 - `QuotaChecker.check` created a `tiered_usages` row as a side effect on every read. Checks are now read-only; row creation is confined to `ConsumptionTracker.track`.
@@ -22,6 +24,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Dead configuration attributes: `payment_processor`, `trial_period_days`, `downgrade_policy`, `event_handlers`, `message_builder` (declared but never read anywhere).
 - `warning_thresholds` from plan DSL (accepted but never read).
 - `Tiered::Validators::CountValidator`, `FeatureValidator`, `HistoryValidator` — no callers exist; quota enforcement is handled by `QuotaLimited` and `QuotaEnforcer`.
+
+### Renamed
+- Gem renamed from `plan_pay` to `tiered`. Module: `Tiered`. Tables: `tiered_assignments`, `tiered_quota_states`, `tiered_usages`. Generator: `rails generate tiered:install`.
 
 ## [0.1.0] - 2026-03-04
 
