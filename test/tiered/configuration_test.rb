@@ -23,6 +23,7 @@ module Tiered
       end
 
       plan = @config.find_plan(:test_plan)
+
       refute_nil plan
       assert_equal :test_plan, plan.key
       assert_equal 'Test Plan', plan.name
@@ -38,6 +39,7 @@ module Tiered
 
       plan = @config.find_plan(:test)
       quota = plan.quota_for(:items)
+
       refute_nil quota
       assert_equal 5, quota[:to]
       assert_equal :persistent, quota[:type]
@@ -50,6 +52,7 @@ module Tiered
 
       plan = @config.find_plan(:test)
       restriction = plan.restriction_for(:feature)
+
       refute_nil restriction
       assert_equal %i[basic advanced], restriction[:values]
       assert plan.allows_feature?(:feature, :basic)

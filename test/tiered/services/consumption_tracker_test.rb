@@ -12,6 +12,7 @@ module Tiered
 
       def test_track_creates_usage_record
         usage = ConsumptionTracker.track(@user, :api_calls, by: 5)
+
         refute_nil usage
         assert_equal 5, usage.used
         assert_equal @user.class.name, usage.plan_owner_type
@@ -28,6 +29,7 @@ module Tiered
 
       def test_track_updates_last_used_at
         usage = ConsumptionTracker.track(@user, :api_calls, by: 1)
+
         refute_nil usage.last_used_at
       end
 
@@ -43,6 +45,7 @@ module Tiered
       def test_track_only_for_per_period_quotas
         # Should return nil for persistent quotas
         result = ConsumptionTracker.track(@user, :households, by: 1)
+
         assert_nil result
       end
 
@@ -56,6 +59,7 @@ module Tiered
           used: 5
         )
         Tiered::Models::Usage.bump(usage.id, 7)
+
         assert_equal 12, usage.reload.used
       end
 
@@ -68,6 +72,7 @@ module Tiered
           plan_owner_id: @user.id,
           quota_key: 'api_calls'
         )
+
         assert_equal 30, usage.used
       end
     end

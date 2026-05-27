@@ -9,7 +9,6 @@ module Tiered
 
       validates :quota_key, presence: true
       validates :plan_owner_type, presence: true
-      validates :plan_owner_id, presence: true
       validates :quota_key, uniqueness: { scope: %i[plan_owner_type plan_owner_id] }
 
       scope :exceeded, -> { where.not(exceeded_at: nil) }

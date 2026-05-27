@@ -65,7 +65,6 @@ module Tiered
                                 "Quota limit exceeded for #{quota_key_sym}: #{current}/#{limit}"
                               end
 
-              errors.add(:base, error_message)
             else
               result = Services::QuotaChecker.check(owner, quota_key_sym)
               return if result.within_quota? || result.unlimited?
@@ -78,8 +77,8 @@ module Tiered
                                 "Quota limit exceeded for #{quota_key_sym}: #{result.current}/#{result.limit}"
                               end
 
-              errors.add(:base, error_message)
             end
+            errors.add(:base, error_message)
           end
         end
       end

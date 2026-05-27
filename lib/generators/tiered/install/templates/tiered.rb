@@ -18,10 +18,10 @@ Tiered.configure do |config|
 
   # Define plans
   config.plan :free do |free|
-    free.name "Free"
-    free.description "Perfect for getting started"
+    free.name 'Free'
+    free.description 'Perfect for getting started'
     free.price 0
-    free.price_string "Free"
+    free.price_string 'Free'
 
     # Example quotas - customize for your app
     # free.quota :households, to: 1, per: nil, type: :persistent
@@ -45,4 +45,3 @@ Tiered.configure do |config|
   #   plus.grace_period_days 7
   # end
 end
-

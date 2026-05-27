@@ -12,7 +12,8 @@ module Tiered
 
       def test_check_persistent_quota_within_limit
         result = QuotaChecker.check(@user, :households)
-        assert result.within_quota?
+
+        assert_predicate result, :within_quota?
         assert_equal 0, result.current
         assert_equal 1, result.limit
       end
@@ -20,14 +21,16 @@ module Tiered
       def test_check_persistent_quota_exceeded
         create_household(user: @user)
         result = QuotaChecker.check(@user, :households)
-        refute result.within_quota?
+
+        refute_predicate result, :within_quota?
         assert_equal 1, result.current
         assert_equal 1, result.limit
       end
 
       def test_check_period_quota_within_limit
         result = QuotaChecker.check(@user, :api_calls)
-        assert result.within_quota?
+
+        assert_predicate result, :within_quota?
         assert_equal 0, result.current
         assert_equal 100, result.limit
       end
@@ -39,7 +42,8 @@ module Tiered
           plan_owner_id: @user.id,
           quota_key: :api_calls
         )
-        assert_nil usage, "QuotaChecker.check must not write DB rows"
+
+        assert_nil usage, 'QuotaChecker.check must not write DB rows'
       end
 
       def test_unlimited_quota
@@ -51,26 +55,31 @@ module Tiered
 
         @user.assign_plan!(:unlimited)
         result = QuotaChecker.check(@user, :items)
-        assert result.unlimited?
+
+        assert_predicate result, :unlimited?
         assert_equal Float::INFINITY, result.limit
       end
 
       def test_remaining_calculation
         result = QuotaChecker.check(@user, :households)
+
         assert_equal 1, result.remaining
 
         create_household(user: @user)
         result = QuotaChecker.check(@user, :households)
+
         assert_equal 0, result.remaining
       end
 
       def test_percent_used_calculation
         result = QuotaChecker.check(@user, :households)
-        assert_equal 0.0, result.percent_used
+
+        assert_in_delta(0.0, result.percent_used)
 
         create_household(user: @user)
         result = QuotaChecker.check(@user, :households)
-        assert_equal 100.0, result.percent_used
+
+        assert_in_delta(100.0, result.percent_used)
       end
     end
   end

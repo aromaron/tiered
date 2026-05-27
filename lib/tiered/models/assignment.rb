@@ -10,7 +10,6 @@ module Tiered
       validates :plan_key, presence: true
       validates :source, presence: true
       validates :plan_owner_type, presence: true
-      validates :plan_owner_id, presence: true
       validates :plan_owner_id, uniqueness: { scope: :plan_owner_type }
 
       scope :for_plan, ->(plan_key) { where(plan_key: plan_key) }

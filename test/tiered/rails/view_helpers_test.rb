@@ -22,17 +22,20 @@ module Tiered
 
       def test_quota_severity_blocked_when_exceeded_with_block_usage_policy
         create_household(user: @user)
+
         assert_equal :blocked, @view.quota_severity(:households, plan_owner: @user)
       end
 
       def test_tiered_quota_alert_empty_when_within_limit
         result = @view.tiered_quota_alert(quota: :households, plan_owner: @user)
+
         assert_equal '', result
       end
 
       def test_tiered_quota_alert_renders_html_when_exceeded
         create_household(user: @user)
         html = @view.tiered_quota_alert(quota: :households, plan_owner: @user)
+
         assert_includes html, 'tiered-quota-alert'
         assert_includes html, 'blocked'
       end
@@ -47,12 +50,14 @@ module Tiered
         end
         @user.assign_plan!(:unlimited_plan)
         result = @view.tiered_quota_meter(quota: :households, plan_owner: @user)
+
         assert_equal '', result
       end
 
       def test_quota_remaining_returns_count
         assert_equal 1, @view.quota_remaining(:households, plan_owner: @user)
         create_household(user: @user)
+
         assert_equal 0, @view.quota_remaining(:households, plan_owner: @user)
       end
 

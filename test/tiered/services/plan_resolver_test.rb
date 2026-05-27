@@ -12,6 +12,7 @@ module Tiered
 
       def test_resolves_default_plan_when_no_assignment
         plan = PlanResolver.resolve(@user)
+
         refute_nil plan
         assert_equal :free, plan.key
       end
@@ -19,11 +20,13 @@ module Tiered
       def test_resolves_assigned_plan
         PlanResolver.assign_plan!(@user, :plus, source: 'manual')
         plan = PlanResolver.resolve(@user)
+
         assert_equal :plus, plan.key
       end
 
       def test_assign_plan_creates_assignment
         assignment = PlanResolver.assign_plan!(@user, :plus, source: 'manual')
+
         refute_nil assignment
         assert_equal :plus, assignment.plan_key.to_sym
         assert_equal 'manual', assignment.source
@@ -39,10 +42,12 @@ module Tiered
 
       def test_remove_plan
         PlanResolver.assign_plan!(@user, :plus)
+
         refute_nil PlanResolver.resolve(@user)
 
         PlanResolver.remove_plan!(@user)
         plan = PlanResolver.resolve(@user)
+
         assert_equal :free, plan.key
       end
     end

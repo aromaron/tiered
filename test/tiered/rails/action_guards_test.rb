@@ -40,22 +40,25 @@ module Tiered
 
       def test_enforce_quota_allows_when_within_limit
         @controller.send(:enforce_quota!, :households)
+
         assert_empty @controller.responses
       end
 
       def test_enforce_quota_blocks_when_exceeded
         create_household(user: @user) # puts user at limit (1/1)
         @controller.send(:enforce_quota!, :households)
+
         assert_equal 1, @controller.responses.length
         assert_equal :forbidden, @controller.responses.first[:head]
       end
 
       def test_enforce_quota_uses_custom_redirect_handler
         create_household(user: @user)
-        @controller.class.tiered_redirect_on_blocked_limit(->(result) {
+        @controller.class.tiered_redirect_on_blocked_limit(lambda { |result|
           redirect_to '/pricing', alert: result.message
         })
         @controller.send(:enforce_quota!, :households)
+
         assert_equal '/pricing', @controller.responses.first[:redirect_to]
       ensure
         @controller.class.remove_method :tiered_redirect_on_blocked_limit
@@ -65,11 +68,13 @@ module Tiered
         # Use an anonymous class to avoid polluting StubController
         klass = Class.new do
           include Tiered::Rails::ActionGuards
+
           tiered_plan_owner_method :fetch_owner
           define_method(:fetch_owner) { 'the_owner' }
           def head(*); end
           def redirect_to(*); end
         end
+
         assert_equal 'the_owner', klass.new.tiered_plan_owner
       end
     end

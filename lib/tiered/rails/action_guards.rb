@@ -6,7 +6,7 @@ module Tiered
       extend ActiveSupport::Concern
 
       class_methods do
-        def guard_action(action_name, quota:, plan_owner: nil)
+        def guard_action(action_name, quota:)
           before_action(only: [action_name]) { enforce_quota!(quota) }
         end
 

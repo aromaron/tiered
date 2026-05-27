@@ -27,7 +27,9 @@ module Tiered
         css_class = options[:class] || 'tiered-quota-meter'
         severity = quota_severity(quota, plan_owner: plan_owner)
 
-        render partial: 'tiered/quota_meter', locals: { css_class: css_class, severity: severity, current: current, max: max, percent: percent }
+        render partial: 'tiered/quota_meter',
+               locals: { css_class: css_class, severity: severity, current: current, max: max,
+                         percent: percent }
       end
 
       def quota_remaining(quota, plan_owner:)

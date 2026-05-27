@@ -21,19 +21,22 @@ module Tiered
       def test_within_quota
         assert @user.within_quota?(:households)
         Household.create!(user: @user, name: 'Household 1')
+
         refute @user.within_quota?(:households)
       end
 
       def test_quota_remaining
         assert_equal 1, @user.quota_remaining(:households)
         Household.create!(user: @user, name: 'Household 1')
+
         assert_equal 0, @user.quota_remaining(:households)
       end
 
       def test_quota_percent_used
-        assert_equal 0.0, @user.quota_percent_used(:households)
+        assert_in_delta(0.0, @user.quota_percent_used(:households))
         Household.create!(user: @user, name: 'Household 1')
-        assert_equal 100.0, @user.quota_percent_used(:households)
+
+        assert_in_delta(100.0, @user.quota_percent_used(:households))
       end
 
       def test_plan_quota_for
@@ -43,19 +46,22 @@ module Tiered
 
       def test_assign_plan
         @user.assign_plan!(:plus)
+
         assert_equal :plus, @user.plan_key
       end
 
       def test_free_tier
-        assert @user.free_tier?
+        assert_predicate @user, :free_tier?
         @user.assign_plan!(:plus)
-        refute @user.free_tier?
+
+        refute_predicate @user, :free_tier?
       end
 
       def test_paid_tier
-        refute @user.paid_tier?
+        refute_predicate @user, :paid_tier?
         @user.assign_plan!(:plus)
-        assert @user.paid_tier?
+
+        assert_predicate @user, :paid_tier?
       end
 
       def test_plan_allows_feature
@@ -70,6 +76,7 @@ module Tiered
 
       def test_quota_severity_blocked_for_block_usage_policy
         create_household(user: @user) # now at limit (1/1)
+
         assert_equal :blocked, @user.quota_severity(:households)
       end
 
@@ -84,6 +91,7 @@ module Tiered
         end
         @user.assign_plan!(:warn_only)
         create_household(user: @user) # now at limit (1/1)
+
         assert_equal :warning, @user.quota_severity(:households)
       end
     end
