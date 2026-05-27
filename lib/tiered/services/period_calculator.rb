@@ -4,7 +4,6 @@ module Tiered
   module Services
     class PeriodCalculator
       PERIOD_TYPES = {
-        billing_cycle: :billing_cycle,
         calendar_month: :calendar_month,
         calendar_week: :calendar_week,
         calendar_day: :calendar_day
@@ -12,12 +11,9 @@ module Tiered
 
       class << self
         def calculate(period_type, reference_time = Time.current)
-          # Normalize common aliases
           period_type = normalize_period_type(period_type)
 
           case period_type
-          when :billing_cycle
-            calculate_billing_cycle(reference_time)
           when :calendar_month
             calculate_calendar_month(reference_time)
           when :calendar_week
@@ -48,14 +44,6 @@ module Tiered
         end
 
         private
-
-        def calculate_billing_cycle(reference_time)
-          # For billing cycle, we use the first of the month as the start
-          # This is a simplified version - can be enhanced with actual billing dates
-          start_time = reference_time.beginning_of_month
-          end_time = reference_time.end_of_month
-          { start: start_time, end: end_time }
-        end
 
         def calculate_calendar_month(reference_time)
           start_time = reference_time.beginning_of_month

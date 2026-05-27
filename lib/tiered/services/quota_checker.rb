@@ -24,11 +24,11 @@ module Tiered
         end
 
         def unlimited?
-          @limit == :unlimited
+          @limit == Float::INFINITY
         end
 
         def remaining
-          return :unlimited if unlimited?
+          return Float::INFINITY if unlimited?
           return 0 if exceeded?
 
           @limit - @current
@@ -51,7 +51,7 @@ module Tiered
             return Result.new(
               within_quota: true,
               current: 0,
-              limit: :unlimited,
+              limit: Float::INFINITY,
               quota_key: quota_key,
               quota_type: :none,
               message: "No quota defined for #{quota_key}"
@@ -71,30 +71,14 @@ module Tiered
 
         def check_persistent_quota(plan_owner, quota_key, quota_def, _plan)
           limit = quota_def[:to]
-          if limit == :unlimited
-            return Result.new(
-              within_quota: true,
-              current: 0,
-              limit: :unlimited,
-              quota_key: quota_key,
-              quota_type: :persistent
-            )
-          end
 
-          # Use scope if provided, otherwise count directly
           scope = quota_def[:scope]
           unless scope
             raise Error, "Scope required for persistent quota #{quota_key}. Provide a scope in plan definition."
           end
 
-          # Scope is a lambda that takes the plan_owner and returns a relation
           relation = scope.call(plan_owner)
           current = relation.respond_to?(:count) ? relation.count : 0
-
-          # Default: count records with quota_key matching the plan_owner
-          # This is a simplified version - apps should provide scopes
-          # For v1.0, we require scopes to be provided for persistent quotas
-
           within_quota = current < limit
 
           Result.new(
@@ -109,16 +93,6 @@ module Tiered
 
         def check_period_quota(plan_owner, quota_key, quota_def, _plan)
           limit = quota_def[:to]
-          if limit == :unlimited
-            return Result.new(
-              within_quota: true,
-              current: 0,
-              limit: :unlimited,
-              quota_key: quota_key,
-              quota_type: :per_period
-            )
-          end
-
           period_type = quota_def[:per] || Tiered.configuration.period_cycle
           period = PeriodCalculator.calculate(period_type)
 

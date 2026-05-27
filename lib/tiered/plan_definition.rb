@@ -54,7 +54,7 @@ module Tiered
 
     def quota(quota_key, to:, per: nil, type: :persistent, scope: nil)
       @quotas[quota_key.to_sym] = {
-        to: to,
+        to: to == :unlimited ? Float::INFINITY : to,
         per: per,
         type: type,
         scope: scope
@@ -84,7 +84,7 @@ module Tiered
       quota = quota_for(quota_key)
       return false unless quota
 
-      quota[:to] == :unlimited
+      quota[:to] == Float::INFINITY
     end
   end
 end

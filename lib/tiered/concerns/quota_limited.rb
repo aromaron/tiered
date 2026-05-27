@@ -11,18 +11,16 @@ module Tiered
       end
 
       class_methods do
-        def quota_limited_by(quota_key, plan_owner:, count_scope: nil, error_after_quota: nil, if: nil)
+        def quota_limited_by(quota_key, plan_owner:, scope: nil, error_after_quota: nil, if: nil)
           quota_key_sym = quota_key.to_sym
           condition_proc = binding.local_variable_get(:if)
 
-          # Add validation with optional condition
           if condition_proc
             validate :check_quota_limit, on: :create, if: condition_proc
           else
             validate :check_quota_limit, on: :create
           end
 
-          # Define instance methods
           define_method :plan_owner_for_quota do
             if plan_owner.is_a?(Proc)
               instance_eval(&plan_owner)
@@ -40,29 +38,21 @@ module Tiered
             return 0 unless owner
 
             quota_def = owner.current_plan&.quota_for(quota_key_sym)
-            limit = quota_def&.dig(:to) || 0
-            limit == :unlimited ? Float::INFINITY : limit
-          end
-
-          define_method :count_scope_for_quota do
-            count_scope
+            quota_def&.dig(:to) || 0
           end
 
           define_method :check_quota_limit do
             owner = plan_owner_for_quota
             return unless owner
 
-            # If count_scope is provided, use it for per-resource quotas
-            # Otherwise use QuotaChecker with plan-defined scope
-            if count_scope
+            if scope
               quota_def = owner.current_plan&.quota_for(quota_key_sym)
               return unless quota_def
 
               limit = quota_def[:to]
-              return if limit == :unlimited
+              return if limit == Float::INFINITY
 
-              # count_scope is evaluated with self (the instance) as context
-              relation = instance_eval(&count_scope)
+              relation = instance_eval(&scope)
               current = relation.respond_to?(:count) ? relation.count : 0
 
               return if current < limit

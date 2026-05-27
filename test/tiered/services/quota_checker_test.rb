@@ -52,7 +52,7 @@ module Tiered
         @user.assign_plan!(:unlimited)
         result = QuotaChecker.check(@user, :items)
         assert result.unlimited?
-        assert_equal :unlimited, result.limit
+        assert_equal Float::INFINITY, result.limit
       end
 
       def test_remaining_calculation

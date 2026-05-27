@@ -5,7 +5,7 @@ Tiered.configure do |config|
   config.default_plan = :free
 
   # Set the period cycle for per-period quotas
-  # Options: :billing_cycle, :calendar_month, :calendar_week, :calendar_day
+  # Options: :calendar_month, :calendar_week, :calendar_day
   config.period_cycle = :calendar_month
 
   # Define how to resolve the plan owner from a controller

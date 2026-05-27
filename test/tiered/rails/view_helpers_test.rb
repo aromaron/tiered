@@ -42,7 +42,7 @@ module Tiered
       def test_tiered_quota_alert_renders_html_when_exceeded
         create_household(user: @user)
         html = @view.tiered_quota_alert(quota: :households, plan_owner: @user)
-        assert_includes html, 'plan-pay-quota-alert'
+        assert_includes html, 'tiered-quota-alert'
         assert_includes html, 'blocked'
       end
 
