@@ -52,7 +52,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 - Plan definition DSL (`Tiered.configure { |c| c.plan(:free) { ... } }`) supporting persistent and per-period quotas, feature restrictions, and after-quota policies (`:block_usage`, `:grace_then_block`, `:just_warn`).
-- `Tiered::Concerns::HasPlan` — mixin for owner models (User, Team) providing `current_plan`, `within_quota?`, `quota_remaining`, `quota_percent_used`, `assign_plan!`, `remove_plan!`, `free_tier?`, `paid_tier?`, `quota_severity`, `quota_message`.
+- `Tiered::Concerns::HasPlan` — mixin for owner models (User, Team) providing `current_plan`, `within_quota?`, `quota_remaining`, `quota_percent_used`, `assign_plan!`, `remove_plan!`, `free_plan?`, `paid_plan?`, `quota_severity`, `quota_message`.
 - `Tiered::Concerns::QuotaLimited` — mixin for resource models with `quota_limited_by` macro that adds a `before_validation` quota check on create.
 - `Tiered::Rails::ActionGuards` — controller concern with `guard_action :create, quota: :projects` that installs a `before_action` enforcing quota policy.
 - `Tiered::Rails::ViewHelpers` — auto-mixed into ActionView via Railtie; provides `tiered_quota_alert`, `tiered_quota_meter`, `quota_remaining`, `quota_percent_used`, `quota_severity`, `quota_message`, `plan_allows?`.

@@ -51,17 +51,17 @@ module Tiered
       end
 
       def test_free_tier
-        assert_predicate @user, :free_tier?
+        assert_predicate @user, :free_plan?
         @user.assign_plan!(:plus)
 
-        refute_predicate @user, :free_tier?
+        refute_predicate @user, :free_plan?
       end
 
       def test_paid_tier
-        refute_predicate @user, :paid_tier?
+        refute_predicate @user, :paid_plan?
         @user.assign_plan!(:plus)
 
-        assert_predicate @user, :paid_tier?
+        assert_predicate @user, :paid_plan?
       end
 
       def test_plan_allows_feature

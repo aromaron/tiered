@@ -68,15 +68,15 @@ module Tiered
         Services::PlanResolver.remove_plan!(self)
       end
 
-      def free_tier?
+      def free_plan?
         plan = current_plan
         return false unless plan
 
         plan.price.zero?
       end
 
-      def paid_tier?
-        !free_tier?
+      def paid_plan?
+        !free_plan?
       end
 
       def quota_severity(quota_key)

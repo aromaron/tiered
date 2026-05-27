@@ -138,8 +138,8 @@ user.assign_plan!(:pro, source: 'stripe')
 user.remove_plan!
 
 # Check tier
-user.free_tier?  # => true/false
-user.paid_tier?  # => true/false
+user.free_plan?  # => true/false
+user.paid_plan?  # => true/false
 ```
 
 ### Enforcing Quotas on Models
