@@ -1,0 +1,6 @@
+<div class="<%= css_class %> <%= css_class %>--<%= severity %>">
+  <div class="<%= css_class %>__bar">
+    <div class="<%= css_class %>__fill" style="width: <%= percent %>%"></div>
+  </div>
+  <div class="<%= css_class %>__label"><%= current %> / <%= max == Float::INFINITY ? '∞' : max %></div>
+</div>

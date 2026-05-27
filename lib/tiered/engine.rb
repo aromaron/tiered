@@ -1,8 +1,8 @@
 # frozen_string_literal: true
 
 module Tiered
-  if defined?(Rails::Railtie)
-    class Railtie < Rails::Railtie
+  if defined?(Rails::Engine)
+    class Engine < Rails::Engine
       generators do
         require_relative '../generators/tiered/install/install_generator'
       end

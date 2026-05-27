@@ -7,7 +7,7 @@ module Tiered
 
       class_methods do
         def guard_action(action_name, quota:, plan_owner: nil)
-          before_action :"enforce_#{quota}_quota!", only: [action_name]
+          before_action(only: [action_name]) { enforce_quota!(quota) }
         end
 
         def tiered_plan_owner_method(method_name)
@@ -48,23 +48,6 @@ module Tiered
           instance_exec(result, &redirect_handler)
         else
           head :forbidden
-        end
-      end
-
-      def method_missing(method_name, *args, &)
-        if method_name.to_s.start_with?('enforce_') && method_name.to_s.end_with?('_quota!')
-          quota_key = method_name.to_s.gsub(/^enforce_/, '').gsub(/_quota!$/, '').to_sym
-          enforce_quota!(quota_key)
-        else
-          super
-        end
-      end
-
-      def respond_to_missing?(method_name, include_private = false)
-        if method_name.to_s.start_with?('enforce_') && method_name.to_s.end_with?('_quota!')
-          true
-        else
-          super
         end
       end
 
