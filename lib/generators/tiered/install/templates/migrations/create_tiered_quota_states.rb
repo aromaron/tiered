@@ -14,9 +14,9 @@ class CreateTieredQuotaStates < ActiveRecord::Migration[<%= ActiveRecord::Migrat
     end
 
     add_index :tiered_quota_states,
-              [:plan_owner_type, :plan_owner_id, :quota_key],
+              %i[plan_owner_type plan_owner_id quota_key],
               unique: true, name: "idx_tiered_quota_states_unique"
-    add_index :tiered_quota_states, [:plan_owner_type, :plan_owner_id],
+    add_index :tiered_quota_states, %i[plan_owner_type plan_owner_id],
               name: "idx_tiered_quota_states_on_plan_owner"
     add_index :tiered_quota_states, :exceeded_at
   end
