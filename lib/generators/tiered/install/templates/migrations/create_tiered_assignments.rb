@@ -9,7 +9,7 @@ class CreateTieredAssignments < ActiveRecord::Migration[<%= ActiveRecord::Migrat
       t.timestamps
     end
 
-    add_index :tiered_assignments, [:plan_owner_type, :plan_owner_id],
+    add_index :tiered_assignments, %i[plan_owner_type plan_owner_id],
               unique: true, name: "idx_tiered_assignments_on_plan_owner"
     add_index :tiered_assignments, :plan_key
   end

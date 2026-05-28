@@ -13,10 +13,10 @@ class CreateTieredUsages < ActiveRecord::Migration[<%= ActiveRecord::Migration.c
     end
 
     add_index :tiered_usages,
-              [:plan_owner_type, :plan_owner_id, :quota_key, :period_start],
+              %i[plan_owner_type plan_owner_id quota_key period_start],
               unique: true, name: "idx_tiered_usages_unique"
-    add_index :tiered_usages, [:plan_owner_type, :plan_owner_id],
+    add_index :tiered_usages, %i[plan_owner_type plan_owner_id],
               name: "idx_tiered_usages_on_plan_owner"
-    add_index :tiered_usages, [:period_start, :period_end]
+    add_index :tiered_usages, %i[period_start period_end]
   end
 end
