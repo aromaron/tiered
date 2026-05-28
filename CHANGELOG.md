@@ -11,6 +11,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixed
 - `rails generate tiered:install` produced doubled timestamp prefixes in migration filenames (e.g. `20260528_20260528_create_tiered_assignments.rb`). Migration destination paths no longer include a manual prefix — `ActiveRecord::Generators::Migration` handles timestamping automatically.
+- UUID auto-detection in the install generator always returned `false` because `Rails` inside `module Tiered::Rails` resolved to the gem's own namespace. Fixed by using the absolute constant `::Rails`.
 
 ### Changed
 - Install generator auto-detects UUID primary keys from `Rails.application.config.generators` and emits `id: :uuid` / `type: :uuid` in migrations when detected. Pass `--uuid` or `--no-uuid` to override.
