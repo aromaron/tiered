@@ -39,6 +39,37 @@ module Tiered
           assert_match(/create_table :tiered_usages/, content)
         end
       end
+
+      def test_no_uuid_by_default
+        run_generator
+        assert_migration 'db/migrate/create_tiered_assignments.rb' do |content|
+          assert_no_match(/id: :uuid/, content)
+          assert_no_match(/type: :uuid/, content)
+        end
+      end
+
+      def test_uuid_flag_emits_uuid_options
+        run_generator ['--uuid']
+        assert_migration 'db/migrate/create_tiered_assignments.rb' do |content|
+          assert_match(/id: :uuid/, content)
+          assert_match(/type: :uuid/, content)
+        end
+      end
+
+      def test_named_compound_indexes
+        run_generator
+        assert_migration 'db/migrate/create_tiered_assignments.rb' do |content|
+          assert_match(/idx_tiered_assignments_on_plan_owner/, content)
+        end
+        assert_migration 'db/migrate/create_tiered_quota_states.rb' do |content|
+          assert_match(/idx_tiered_quota_states_unique/, content)
+          assert_match(/idx_tiered_quota_states_on_plan_owner/, content)
+        end
+        assert_migration 'db/migrate/create_tiered_usages.rb' do |content|
+          assert_match(/idx_tiered_usages_unique/, content)
+          assert_match(/idx_tiered_usages_on_plan_owner/, content)
+        end
+      end
     end
   end
 end
