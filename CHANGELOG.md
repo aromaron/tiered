@@ -7,6 +7,16 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.3.1] - 2026-05-28
+
+### Fixed
+- `rails generate tiered:install` produced doubled timestamp prefixes in migration filenames (e.g. `20260528_20260528_create_tiered_assignments.rb`). Migration destination paths no longer include a manual prefix — `ActiveRecord::Generators::Migration` handles timestamping automatically.
+
+### Changed
+- Install generator auto-detects UUID primary keys from `Rails.application.config.generators` and emits `id: :uuid` / `type: :uuid` in migrations when detected. Pass `--uuid` or `--no-uuid` to override.
+- All compound indexes in generated migrations now carry explicit `name:` values (short `idx_` prefix) to avoid PostgreSQL's 63-character limit and ensure predictable names across apps.
+- Removed the PostgreSQL-only partial index (`WHERE exceeded_at IS NOT NULL`) from the `tiered_quota_states` migration template — replaced with a plain index that works on all adapters.
+
 ## [0.3.0] - 2026-05-27
 
 ### Breaking Changes

@@ -2,8 +2,8 @@
 
 class CreateTieredQuotaStates < ActiveRecord::Migration[<%= ActiveRecord::Migration.current_version %>]
   def change
-    create_table :tiered_quota_states do |t|
-      t.references :plan_owner, polymorphic: true, null: false
+    create_table :tiered_quota_states<% if uuid? %>, id: :uuid<% end %> do |t|
+      t.references :plan_owner, polymorphic: true, null: false, index: false<% if uuid? %>, type: :uuid<% end %>
       t.string :quota_key, null: false
       t.datetime :exceeded_at
       t.datetime :blocked_at
@@ -15,17 +15,9 @@ class CreateTieredQuotaStates < ActiveRecord::Migration[<%= ActiveRecord::Migrat
 
     add_index :tiered_quota_states,
               [:plan_owner_type, :plan_owner_id, :quota_key],
-              unique: true,
-              name: "index_tiered_quota_states_unique"
-    add_index :tiered_quota_states, [:plan_owner_type, :plan_owner_id]
-    # Partial index for exceeded_at (PostgreSQL syntax)
-    if connection.adapter_name == "PostgreSQL"
-      add_index :tiered_quota_states,
-                :exceeded_at,
-                where: "exceeded_at IS NOT NULL"
-    else
-      add_index :tiered_quota_states, :exceeded_at
-    end
+              unique: true, name: "idx_tiered_quota_states_unique"
+    add_index :tiered_quota_states, [:plan_owner_type, :plan_owner_id],
+              name: "idx_tiered_quota_states_on_plan_owner"
+    add_index :tiered_quota_states, :exceeded_at
   end
 end
-
