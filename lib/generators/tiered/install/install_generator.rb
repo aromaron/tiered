@@ -12,7 +12,7 @@ module Tiered
 
       desc 'Installs Tiered and generates the necessary migrations and initializer'
 
-      class_option :uuid, type: :boolean, default: nil,
+      class_option :uuid, type: :boolean, default: nil, hide: true,
                           desc: 'Use UUID primary keys (auto-detected from app config if not set)'
 
       def create_migrations
@@ -37,9 +37,9 @@ module Tiered
       end
 
       def detect_uuid_from_app?
-        return false unless defined?(Rails) && Rails.application
+        return false unless defined?(::Rails) && ::Rails.application
 
-        ar_config = Rails.application.config.generators.options[:active_record] || {}
+        ar_config = ::Rails.application.config.generators.options[:active_record] || {}
         ar_config[:primary_key_type] == :uuid
       rescue StandardError
         false
